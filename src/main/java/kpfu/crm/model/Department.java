@@ -15,7 +15,7 @@ import java.util.List;
 public class Department extends BaseEntity {
     private String name;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Teacher> teachers;
 
     @Override

@@ -17,13 +17,11 @@ public class Teacher extends BaseEntity {
     private String position;
     private float workingRate;
 
-    @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<ActivityRecord> activityRecords;
 
     @Override
     public String[] ignoreProperties() {
-        return new String[]{
-                "activityRecords"
-        };
+        return new String[]{"activityRecords"};
     }
 }
