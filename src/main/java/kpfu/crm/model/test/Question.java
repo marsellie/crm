@@ -26,6 +26,7 @@ import static java.util.function.Function.identity;
 public class Question extends BaseEntity {
 
     @NotBlank
+    @Column(name = "question_value")
     private String value;
 
     private Integer score;

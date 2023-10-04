@@ -19,9 +19,9 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
-import static java.lang.Math.ceil;
 import static java.util.Comparator.comparing;
 import static kpfu.crm.model.test.Question.Type.ONE;
 import static kpfu.crm.model.test.Question.Type.TEXT;
@@ -65,7 +65,9 @@ public class ResultService {
             setTotal(answers);
 
             int totalResult = answers.stream()
-                    .mapToInt(Answer::getTotal)
+                    .map(Answer::getTotal)
+                    .filter(Objects::nonNull)
+                    .mapToInt(a -> a)
                     .sum();
 
             result.setTotal(totalResult);
@@ -91,9 +93,6 @@ public class ResultService {
 
                         if (allOptions == validOptions) {
                             a.setTotal(question.getScore());
-                        } else {
-                            double percentOfValid = validOptions / (double) allOptions;
-                            a.setTotal((int) ceil(percentOfValid * question.getScore()));
                         }
                     }
                 });

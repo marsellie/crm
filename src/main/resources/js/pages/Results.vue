@@ -56,32 +56,97 @@
 
                                 <v-divider/>
 
-                                <v-card-text v-if="test.questions[index].type === 'Текстовый вопрос'">
-                                    {{ answer.text }}
-                                </v-card-text>
+                                <div v-if="test.questions[index].type === 'Текстовый вопрос'">
+                                    <v-card-title>
+                                        Ответ:
+                                    </v-card-title>
 
-                                <v-radio-group
+                                    <v-divider/>
+
+                                    <v-card-text>
+                                        {{ answer.text }}
+                                    </v-card-text>
+                                </div>
+
+                                <div
                                     v-if="test.questions[index].type === 'Одиночный выбор'"
-                                    value="1"
-                                    class="ma-0 pa-4"
-                                    single-line dense hide-details
-                                    outlined
                                 >
-                                    <v-radio
-                                        :label="answer.option"
+                                    <v-radio-group
+                                        :value="test.questions[index].options.filter(option => option.valid).map(option => option.id)[0]"
+                                        class="ma-0 pa-4"
+                                        single-line dense hide-details
+                                        readonly
+                                        outlined
+                                    >
+                                        <v-radio
+                                            v-for="(option, index) in test.questions[index].options"
+                                            :key="option.id"
+                                            :value="index"
+                                            :label="option.value"
+                                            readonly
+                                            single-line dense hide-details
+                                            outlined
+                                        />
+                                    </v-radio-group>
+
+                                    <v-divider/>
+
+                                    <v-card-title>
+                                        Ответ:
+                                    </v-card-title>
+
+                                    <v-divider/>
+
+                                    <v-radio-group
                                         value="1"
+                                        class="ma-0 pa-4"
                                         single-line dense hide-details
                                         outlined
-                                    />
-                                </v-radio-group>
+                                    >
+                                        <v-radio
+                                            :label="answer.option"
+                                            value="1"
+                                            readonly
+                                            single-line dense hide-details
+                                            outlined
+                                        />
+                                    </v-radio-group>
+                                </div>
 
-                                <v-checkbox
-                                    v-if="test.questions[index].type === 'Множественный выбор'"
-                                    v-for="option in answer.options"
-                                    :key="option"
-                                    :label="option"
-                                    :value="true"
-                                />
+                                <div v-if="test.questions[index].type === 'Множественный выбор'">
+                                    <div class="pa-4">
+                                        <v-checkbox
+                                            v-for="option in test.questions[index].options"
+                                            v-model="option.valid"
+                                            :key="option.id"
+                                            readonly
+                                            :label="option.value"
+                                            single-line dense hide-details
+                                            outlined
+                                        />
+                                    </div>
+
+                                    <v-divider/>
+
+                                    <v-card-title>
+                                        Ответ:
+                                    </v-card-title>
+
+                                    <v-divider/>
+
+                                    <div class="pa-4">
+                                        <v-checkbox
+                                            v-for="option in answer.options"
+                                            :key="option"
+                                            :label="option"
+                                            :value="option.selected"
+                                            v-model="option.selected"
+                                            readonly
+                                            single-line dense hide-details
+                                            outlined
+                                        />
+                                    </div>
+                                </div>
                             </v-card>
                         </div>
                     </td>
@@ -122,6 +187,7 @@ class Question {
 class Option {
     id
     value
+    valid
 }
 
 class Result {
