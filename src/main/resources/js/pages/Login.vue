@@ -67,8 +67,9 @@ import endpoints from "../use/endpoints";
 
 export default {
     created() {
-        if (this.profile)
+        if (this.profile) {
             this.$router.push("/")
+        }
     },
     data() {
         return {

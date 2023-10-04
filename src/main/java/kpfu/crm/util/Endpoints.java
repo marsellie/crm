@@ -1,7 +1,12 @@
 package kpfu.crm.util;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class Endpoints {
-    public final static String ACTIVITY_RECORD = "api/activity_record";
-    public final static String DEPARTMENT = "api/department";
-    public final static String TEACHER = "api/teacher";
+
+    private static final String API = "/api";
+    public static final String TEST = API + "/test";
+    public static final String RESULT = API + "/result";
+    public static final String USER = API + "/user";
 }

@@ -1,7 +1,9 @@
+const api = '/api';
+
 export default {
-    login: '/api/login',
-    logout: '/api/logout',
-    department: '/api/department',
-    activityRecord: '/api/activity_record',
-    teacher: '/api/teacher',
+    login: api + '/login',
+    logout: api + '/logout',
+    test: api + '/test',
+    result: api + '/result',
+    user: api + '/user'
 }
