@@ -1,16 +1,8 @@
 <template>
     <v-container class="fill-height">
-        <v-card
-            style="margin: auto; border: 1px solid"
-            :color="colors.focus"
-            tile flat
-            width="450"
-        >
+        <v-card style="margin: auto; border: 1px solid" :color="colors.focus" tile flat width="450">
             <v-card-title>
-                <span
-                    class="text-center"
-                    style="width: 100%"
-                >
+                <span class="text-center" style="width: 100%">
                     Вход
                 </span>
             </v-card-title>

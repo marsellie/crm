@@ -3,9 +3,14 @@ package kpfu.crm.service;
 import kpfu.crm.config.security.UserDetailImpl;
 import kpfu.crm.exception.RestException;
 import kpfu.crm.mapper.ResultMapper;
+import kpfu.crm.mapper.TestMapper;
+import kpfu.crm.model.BaseEntity;
+import kpfu.crm.model.dto.CombinedDTO;
 import kpfu.crm.model.result.Answer;
 import kpfu.crm.model.result.Result;
 import kpfu.crm.model.result.dto.ResultDTO;
+import kpfu.crm.model.result.dto.UpdateResultDTO;
+import kpfu.crm.model.result.dto.UpdateResultDTO.UpdateAnswerDTO;
 import kpfu.crm.model.test.Option;
 import kpfu.crm.model.test.Question;
 import kpfu.crm.model.test.Test;
@@ -21,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static java.util.Comparator.comparing;
 import static kpfu.crm.model.test.Question.Type.ONE;
@@ -33,6 +39,7 @@ public class ResultService {
 
     private final ResultRepo repo;
     private final ResultMapper mapper;
+    private final TestMapper testMapper;
     private final UserService userService;
     private final TestService testService;
 
@@ -40,12 +47,26 @@ public class ResultService {
         Test test = testService.getById(testId);
         testService.validateUserOwnsTest(user, test);
 
-        List<Result> results = repo.findByTest(test);
-        results.forEach(r -> r.getAnswers().sort(comparing(a -> a.getQuestion().getPosition())));
+        return test.getResults().stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    public List<CombinedDTO> findAll(UserDetailImpl user) {
+        List<Result> results = repo.findByAppUser(userService.getById(user.getId()));
 
         return results.stream()
-                .map(mapper::toDto)
+                .map(r -> new CombinedDTO()
+                        .with("test", testMapper.toDto(r.getTest()))
+                        .with("result", toDto(r))
+                )
                 .toList();
+    }
+
+    private ResultDTO toDto(Result result) {
+        result.getAnswers().sort(comparing(a -> a.getQuestion().getPosition()));
+
+        return mapper.toDto(result);
     }
 
     public void createResult(UserDetailImpl user, UUID testId, CreateResultDTO dto) {
@@ -86,12 +107,15 @@ public class ResultService {
                             a.setTotal(question.getScore());
                         }
                     } else {
-                        long validOptions = a.getOptions().stream()
+                        long selectedValidOptions = a.getOptions().stream()
                                 .map(Option::getValid)
+                                .filter(b -> b)
                                 .count();
-                        int allOptions = question.getOptions().size();
+                        long allValidOptions = question.getOptions().stream()
+                                .filter(Option::getValid)
+                                .count();
 
-                        if (allOptions == validOptions) {
+                        if (allValidOptions == selectedValidOptions) {
                             a.setTotal(question.getScore());
                         }
                     }
@@ -168,5 +192,48 @@ public class ResultService {
                     String errorMessage = "Не найден ответ с ID = %s".formatted(answerId);
                     return new RestException(errorMessage);
                 });
+    }
+
+    public void updateResult(UserDetailImpl user, UUID resultId, UpdateResultDTO dto) {
+        Result result = repo.getReferenceById(resultId);
+        testService.validateUserOwnsTest(user, result.getTest());
+
+        List<UUID> dtoAnswerIds = dto.getAnswers().stream()
+                .map(UpdateAnswerDTO::getId)
+                .sorted()
+                .toList();
+
+        List<UUID> answerIds = result.getAnswers().stream()
+                .map(BaseEntity::getId)
+                .sorted()
+                .toList();
+
+        areEqual(dtoAnswerIds.size(), answerIds.size(), "Размерность ответов не совпадает");
+
+        for (int i = 0; i < dtoAnswerIds.size(); i++) {
+            UUID dtoId = dtoAnswerIds.get(i);
+            UUID answerId = answerIds.get(i);
+
+            areEqual(dtoId, answerId, "Идентификаторы ответов не совпадают");
+        }
+
+        for (Answer answer : result.getAnswers()) {
+            Integer updated = dto.getAnswers().stream()
+                    .filter(da -> da.getId().equals(answer.getId()))
+                    .findFirst()
+                    .orElseThrow()
+                    .getScore();
+
+            answer.setTotal(updated);
+        }
+
+        result.setTotal(
+                result.getAnswers().stream()
+                        .filter(a -> a.getTotal() != null)
+                        .mapToInt(Answer::getTotal)
+                        .sum()
+        );
+
+        repo.save(result);
     }
 }

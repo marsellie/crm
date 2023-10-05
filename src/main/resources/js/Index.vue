@@ -9,6 +9,16 @@
             >
                 На главную
             </v-btn>
+
+            <v-btn
+                :color="colors.button"
+                class="ml-4 white--text"
+                rounded
+                href="/my-results"
+            >
+                Мои результаты
+            </v-btn>
+
             <v-btn
                 :color="colors.button"
                 class="ml-4 white--text"

@@ -9,7 +9,7 @@
                 :loading="table.loading"
             >
                 <template v-slot:item.finishedCheckbox="{ item }">
-                    {{item.finished ? 'Нет' : 'Да'}}
+                    {{item.result.finished ? 'Нет' : 'Да'}}
                 </template>
 
                 <template v-slot:top>
@@ -41,13 +41,12 @@
                     <td
                         :colspan="headers.length"
                         class="py-4"
-                        v-if="test"
+                        v-if="item.test"
                     >
                         <test-result
                             @reload-results="loadItems"
-                            :editable="true"
-                            :test="test"
-                            :result="item"
+                            :test="item.test"
+                            :result="item.result"
                         />
                     </td>
                 </template>
@@ -122,18 +121,13 @@ export default {
                  */
                 items: [],
                 headers: [
-                    {text: 'Имя пользователя', value: 'user'},
                     {text: 'Создан', value: 'createdAtFormat'},
-                    {text: 'Количество баллов', value: 'total'},
+                    {text: 'Количество баллов', value: 'result.total'},
                     {text: 'Необходима проверка', value: 'finishedCheckbox'}
                 ],
                 search: '',
                 loading: false
             },
-            /**
-             * @type {Test}
-             */
-            test: undefined,
             results: undefined,
             colors: colors
         }
@@ -149,7 +143,7 @@ export default {
         loadItems() {
             this.table.loading = true
 
-            api.get(`${endpoints.result}/${this.$route.params.id}`)
+            api.get(`${endpoints.result}`)
                 .then(resp => {
                     this.table.items = resp.data
 
@@ -165,13 +159,11 @@ export default {
                     });
 
                     for (let item of this.table.items) {
-                        item.createdAtFormat = formatter.format(new Date(item.createdAt)) + ' (МСК)'
+                        item.createdAtFormat = formatter.format(new Date(item.result.createdAt)) + ' (МСК)'
                     }
 
                     this.table.loading = false
                 })
-            api.get(`${endpoints.test}/${this.$route.params.id}`)
-                .then(resp => this.test = resp.data)
         },
     }
 }

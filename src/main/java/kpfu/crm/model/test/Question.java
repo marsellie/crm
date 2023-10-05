@@ -3,8 +3,7 @@ package kpfu.crm.model.test;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import kpfu.crm.exception.RestException;
 import kpfu.crm.model.BaseEntity;
 import lombok.Getter;
@@ -29,6 +28,8 @@ public class Question extends BaseEntity {
     @Column(name = "question_value")
     private String value;
 
+    @Min(value = 1, message = "Допустимы значения от 1")
+    @Max(value = 50, message = "Допустимы значения до 50")
     private Integer score;
 
     @NotNull

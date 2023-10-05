@@ -27,6 +27,9 @@ public class TestDTO {
     private Boolean scored;
 
     @JsonView(ApiView.ListView.class)
+    private Integer total;
+
+    @JsonView(ApiView.ListView.class)
     private String name;
 
     @JsonView(ApiView.FullView.class)

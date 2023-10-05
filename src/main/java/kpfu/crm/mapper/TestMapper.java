@@ -17,9 +17,20 @@ import org.mapstruct.MappingTarget;
 public interface TestMapper {
 
     @Mapping(target = "creatorId", source = "creator.id")
+    @Mapping(target = "total", expression = "java(mapTotal(test))")
     TestDTO toDto(Test test);
 
     void toEntity(@MappingTarget Test test, CreateTestDTO dto);
+
+    default Integer mapTotal(Test test) {
+        if (!test.getScored()) {
+            return null;
+        }
+
+        return test.getQuestions().stream()
+                .mapToInt(Question::getScore)
+                .sum();
+    }
 
     @Mapper(uses = QuestionMapper.VariantMapper.class)
     interface QuestionMapper {

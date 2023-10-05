@@ -18,6 +18,7 @@ public class ResultDTO {
     private UUID id;
     private String user;
     private Integer total;
+    private Boolean finished;
     private Instant createdAt;
     private List<AnswerDTO> answers;
 
@@ -30,7 +31,7 @@ public class ResultDTO {
         private UUID id;
         private String text;
         private String total;
-        private String option;
-        private List<String> options;
+        private UUID optionId;
+        private List<UUID> optionIds;
     }
 }

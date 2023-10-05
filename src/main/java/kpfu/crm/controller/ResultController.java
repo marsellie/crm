@@ -2,10 +2,10 @@ package kpfu.crm.controller;
 
 import jakarta.validation.Valid;
 import kpfu.crm.config.security.UserDetailImpl;
+import kpfu.crm.model.result.dto.UpdateResultDTO;
 import kpfu.crm.model.test.dto.CreateResultDTO;
 import kpfu.crm.service.ResultService;
 import kpfu.crm.util.Endpoints;
-import kpfu.crm.util.ResponseFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +23,13 @@ public class ResultController {
 
     private final ResultService resultService;
 
+    @GetMapping
+    public ResponseEntity<?> getResults(
+            @AuthenticationPrincipal UserDetailImpl user
+    ) {
+        return ok(resultService.findAll(user));
+    }
+
     @GetMapping("{id}")
     public ResponseEntity<?> getResults(
             @AuthenticationPrincipal UserDetailImpl user,
@@ -38,6 +45,16 @@ public class ResultController {
             @RequestBody @Valid CreateResultDTO dto
     ) {
         resultService.createResult(user, testId, dto);
+        return ok();
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<?> postResult(
+            @AuthenticationPrincipal UserDetailImpl user,
+            @PathVariable("id") UUID resultId,
+            @RequestBody @Valid UpdateResultDTO dto
+    ) {
+        resultService.updateResult(user, resultId, dto);
         return ok();
     }
 }

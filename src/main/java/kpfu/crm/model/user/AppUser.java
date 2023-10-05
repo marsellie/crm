@@ -17,7 +17,7 @@ import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
-@Table(name = "usr")
+@Table(name = "app_user")
 @Getter
 @Setter
 public class AppUser extends BaseEntity {
